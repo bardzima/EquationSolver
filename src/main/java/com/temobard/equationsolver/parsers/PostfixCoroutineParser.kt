@@ -6,11 +6,12 @@ import com.temobard.equationsolver.tokens.Number
 import com.temobard.equationsolver.tokens.Operator
 import com.temobard.equationsolver.tokens.OperatorType
 import com.temobard.equationsolver.tokens.Variable
+import kotlinx.coroutines.*
 import java.lang.IllegalArgumentException
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PostfixParser(private val eqString: String) : EquationParser {
+class PostfixCoroutineParser(private val eqString: String) : EquationParser {
 
     private var variableSymbol = "x"
 
@@ -18,20 +19,28 @@ class PostfixParser(private val eqString: String) : EquationParser {
         this.variableSymbol = variableSymbol
     }
 
-    override fun parse(): PostfixNotation {
-        val eq = eqString.replace(" ", "")
+    override fun parse(): PostfixNotation = runBlocking {
+        parseSuspend()
+    }
 
+    suspend fun parseSuspend(): PostfixNotation {
+        val breaks = breakAll(eqString)
+        return PostfixNotation(infixToPostfix(breaks))
+    }
+
+    private suspend fun breakAll(eqString: String): ArrayList<String> = withContext(Dispatchers.Default) {
+        val eq = eqString.replace(" ", "")
         val breaks = ArrayList<String>().apply { add(eq) }
         for (o in OperatorType.values()) {
             val a = ArrayList<String>()
             for (ind in 0 until breaks.size) {
-                a.addAll(breakString(breaks[ind], o.value))
+                val job = async { breakString(breaks[ind], o.value) }
+                a.addAll(job.await())
             }
             breaks.clear()
             breaks.addAll(a)
         }
-
-        return PostfixNotation(infixToPostfix(breaks))
+        breaks
     }
 
     private fun breakString(input: String, delimeter: String): ArrayList<String> {
@@ -85,9 +94,8 @@ class PostfixParser(private val eqString: String) : EquationParser {
 
         while (!stack.isEmpty()) {
             val top = stack.pop();
-            if(stack.peekOrNull<Operator>() != null)
+            if (stack.peekOrNull<Operator>() != null)
                 throw IllegalArgumentException("No matching right parenthesis.");
-//            if (!operators.ContainsKey(top)) throw new ArgumentException("No matching right parenthesis.");
             output.add(top);
         }
 
