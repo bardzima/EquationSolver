@@ -1,28 +1,25 @@
 package com.temobard.equationsolver.parsers
 
-import com.temobard.equationsolver.solvers.PostfixNotation
+import com.temobard.equationsolver.solvers.PostfixSolver
 import com.temobard.equationsolver.tokens.*
 import com.temobard.equationsolver.tokens.Number
 import com.temobard.equationsolver.tokens.Operator
-import com.temobard.equationsolver.tokens.OperatorType
 import com.temobard.equationsolver.tokens.Variable
 import java.lang.IllegalArgumentException
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PostfixParser(private val eqString: String) : EquationParser {
-
-    private var variableSymbol = "x"
+class PostfixParser(eqString: String) : PostfixBaseParser(eqString) {
 
     constructor(eqString: String, variableSymbol: String) : this(eqString) {
         this.variableSymbol = variableSymbol
     }
 
-    override fun parse(): PostfixNotation {
+    override fun parse(): PostfixSolver {
         val eq = eqString.replace(" ", "")
 
         val breaks = ArrayList<String>().apply { add(eq) }
-        for (o in OperatorType.values()) {
+        for (o in Operator.Type.values()) {
             val a = ArrayList<String>()
             for (ind in 0 until breaks.size) {
                 a.addAll(breakString(breaks[ind], o.value))
@@ -31,7 +28,7 @@ class PostfixParser(private val eqString: String) : EquationParser {
             breaks.addAll(a)
         }
 
-        return PostfixNotation(infixToPostfix(breaks))
+        return PostfixSolver(infixToPostfix(breaks))
     }
 
     private fun breakString(input: String, delimeter: String): ArrayList<String> {
@@ -55,14 +52,14 @@ class PostfixParser(private val eqString: String) : EquationParser {
                 is Number, is Variable -> output.add(token)
                 is Operator -> {
                     when (token.type) {
-                        OperatorType.PAR_LEFT -> stack.push(token)
-                        OperatorType.PAR_RIGHT -> {
+                        Operator.Type.PAR_LEFT -> stack.push(token)
+                        Operator.Type.PAR_RIGHT -> {
                             var top = stack.popOrNull<Operator>()
-                            while (top != null && top.type != OperatorType.PAR_LEFT) {
+                            while (top != null && top.type != Operator.Type.PAR_LEFT) {
                                 output.add(top);
                                 top = stack.popOrNull<Operator>()
                             }
-                            if (top?.type != OperatorType.PAR_LEFT)
+                            if (top?.type != Operator.Type.PAR_LEFT)
                                 throw IllegalArgumentException("No matching left parenthesis.");
                         }
                         else -> {
@@ -84,47 +81,14 @@ class PostfixParser(private val eqString: String) : EquationParser {
         }
 
         while (!stack.isEmpty()) {
+            stack.peekOrNull<Operator>()?.let {
+                if(it.type == Operator.Type.PAR_LEFT)
+                    throw IllegalArgumentException("No matching right parenthesis.");
+            }
             val top = stack.pop();
-            if(stack.peekOrNull<Operator>() != null)
-                throw IllegalArgumentException("No matching right parenthesis.");
-//            if (!operators.ContainsKey(top)) throw new ArgumentException("No matching right parenthesis.");
             output.add(top);
         }
 
         return output
-    }
-
-    private fun assignToken(tokenString: String): Token {
-        //Check number
-        val number = parseNumber(tokenString)
-        if (number != null) return Number(number)
-
-        //Check variable
-        if (tokenString.equals(variableSymbol)) return Variable()
-
-        //Check operator
-        for (op in OperatorType.values()) {
-            if (op.value.equals(tokenString)) return Operator(op)
-        }
-
-        throw IllegalArgumentException("Error processing '$tokenString'")
-    }
-
-    private fun parseNumber(numString: String): Double? = numString.toDoubleOrNull()
-}
-
-private inline fun <reified T> Stack<Token>.popOrNull(): T? {
-    return try {
-        pop() as T
-    } catch (e: java.lang.Exception) {
-        null
-    }
-}
-
-private inline fun <reified T> Stack<Token>.peekOrNull(): T? {
-    return try {
-        peek() as T
-    } catch (e: java.lang.Exception) {
-        null
     }
 }
