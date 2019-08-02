@@ -7,13 +7,12 @@ import kotlin.collections.ArrayList
 import kotlin.math.pow
 import kotlin.math.sin
 
-class PostfixNotation(private val polish: ArrayList<Token>) :
-    EquationNotation {
+class PostfixSolver(private val polish: ArrayList<Token>) : EquationSolver {
 
     private val eqString by lazy {
         val stringBuilder = StringBuilder()
-        for(token in polish) {
-            when(token) {
+        for (token in polish) {
+            when (token) {
                 is Number -> stringBuilder.append(token.value)
                 is Variable -> stringBuilder.append(token.symbol)
                 is Operator -> stringBuilder.append(token.type.value)
@@ -46,13 +45,13 @@ class PostfixNotation(private val polish: ArrayList<Token>) :
 
                     stack.push(
                         when (token.type) {
-                            OperatorType.ADD -> left + right
-                            OperatorType.SUBTRACT -> left - right
-                            OperatorType.MULTIPLY -> left * right
-                            OperatorType.DIVIDE -> left / right
-                            OperatorType.POWER -> right.pow(left)
-                            OperatorType.SINUS -> sin(right)
-                            else -> throw Exception()
+                            Operator.Type.ADD -> left + right
+                            Operator.Type.SUBTRACT -> left - right
+                            Operator.Type.MULTIPLY -> left * right
+                            Operator.Type.DIVIDE -> left / right
+                            Operator.Type.POWER -> right.pow(left)
+                            Operator.Type.SINE -> sin(right)
+                            else -> throw IllegalArgumentException()
                         }
                     )
                 }
