@@ -8,7 +8,7 @@ class Operator(val type: Type) : Token {
         MULTIPLY("*", 3, false),
         POWER("^", 4, true),
         SINE("sin", 3, true),
-        COSINUS("cos", 3, false),
+        COSINE("cos", 3, false),
         PAR_LEFT("(", 1, false),
         PAR_RIGHT(")", 1, false)
     }
