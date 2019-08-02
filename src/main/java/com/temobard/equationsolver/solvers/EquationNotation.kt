@@ -1,0 +1,3 @@
+package com.temobard.equationsolver.solvers
+
+interface EquationNotation
