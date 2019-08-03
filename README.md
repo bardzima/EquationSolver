@@ -1,5 +1,5 @@
 # KotlinEquationSolver
-A small but fast growing mathematical expressions parser based on Shunting-yard algorithm.
+A small but fast growing mathematical expressions parser based on the (Shunting-yard algorithm)[https://en.wikipedia.org/wiki/Shunting-yard_algorithm].
 
 Current version includes only the postfix notation (aka "Reverse Polish Notation" (RPN)) based solver, however other notations might be added later.
 
