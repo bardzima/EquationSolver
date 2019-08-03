@@ -5,6 +5,7 @@ import com.temobard.equationsolver.tokens.*
 import com.temobard.equationsolver.tokens.Number
 import com.temobard.equationsolver.tokens.Operator
 import com.temobard.equationsolver.tokens.Variable
+import kotlinx.coroutines.*
 import java.lang.IllegalArgumentException
 import java.util.*
 import kotlin.collections.ArrayList
@@ -15,20 +16,28 @@ class PostfixParser(eqString: String) : PostfixBaseParser(eqString) {
         this.variableSymbol = variableSymbol
     }
 
-    override fun parse(): PostfixSolver {
-        val eq = eqString.replace(" ", "")
+    override fun parse(): PostfixSolver = runBlocking {
+        parseSuspend()
+    }
 
+    suspend fun parseSuspend(): PostfixSolver {
+        val breaks = breakAll(eqString)
+        return PostfixSolver(infixToPostfix(breaks))
+    }
+
+    private suspend fun breakAll(eqString: String): ArrayList<String> = withContext(Dispatchers.Default) {
+        val eq = eqString.replace(" ", "")
         val breaks = ArrayList<String>().apply { add(eq) }
         for (o in Operator.Type.values()) {
             val a = ArrayList<String>()
             for (ind in 0 until breaks.size) {
-                a.addAll(breakString(breaks[ind], o.value))
+                val job = async { breakString(breaks[ind], o.value) }
+                a.addAll(job.await())
             }
             breaks.clear()
             breaks.addAll(a)
         }
-
-        return PostfixSolver(infixToPostfix(breaks))
+        breaks
     }
 
     private fun breakString(input: String, delimeter: String): ArrayList<String> {
@@ -82,7 +91,7 @@ class PostfixParser(eqString: String) : PostfixBaseParser(eqString) {
 
         while (!stack.isEmpty()) {
             stack.peekOrNull<Operator>()?.let {
-                if(it.type == Operator.Type.PAR_LEFT)
+                if (it.type == Operator.Type.PAR_LEFT)
                     throw IllegalArgumentException("No matching right parenthesis.");
             }
             val top = stack.pop();
@@ -90,5 +99,61 @@ class PostfixParser(eqString: String) : PostfixBaseParser(eqString) {
         }
 
         return output
+    }
+
+    private suspend fun infixToPostfixCoroutine_Experimental(tokens: List<String>): ArrayList<Token> =
+        withContext(Dispatchers.IO) {
+        val stack = Stack<Token>()
+        val output = ArrayList<Token>()
+
+        for (tokenString in tokens) {
+            if (tokenString.isEmpty()) continue
+
+            val job = async {
+                assignToken(tokenString)
+            }
+
+            when (val token = job.await()) {
+                is Number, is Variable -> output.add(token)
+                is Operator -> {
+                    when (token.type) {
+                        Operator.Type.PAR_LEFT -> stack.push(token)
+                        Operator.Type.PAR_RIGHT -> {
+                            var top = stack.popOrNull<Operator>()
+                            while (top != null && top.type != Operator.Type.PAR_LEFT) {
+                                output.add(top);
+                                top = stack.popOrNull<Operator>()
+                            }
+                            if (top?.type != Operator.Type.PAR_LEFT)
+                                throw IllegalArgumentException("No matching left parenthesis.");
+                        }
+                        else -> {
+                            var op2 = stack.peekOrNull<Operator>()
+                            while (op2 != null) {
+                                val c = token.type.rank.compareTo(op2.type.rank);
+                                if (c < 0 || !token.type.rightAssociative && c <= 0) {
+                                    output.add(stack.pop());
+                                } else {
+                                    break;
+                                }
+                                op2 = stack.peekOrNull<Operator>()
+                            }
+                            stack.push(token);
+                        }
+                    }
+                }
+            }
+        }
+
+        while (!stack.isEmpty()) {
+            stack.peekOrNull<Operator>()?.let {
+                if (it.type == Operator.Type.PAR_LEFT)
+                    throw IllegalArgumentException("No matching right parenthesis.");
+            }
+            val top = stack.pop();
+            output.add(top);
+        }
+
+        output
     }
 }
