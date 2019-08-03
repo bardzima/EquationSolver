@@ -5,7 +5,6 @@ import com.temobard.equationsolver.tokens.*
 import com.temobard.equationsolver.tokens.Number
 import com.temobard.equationsolver.tokens.Operator
 import com.temobard.equationsolver.tokens.Variable
-import jdk.nashorn.internal.objects.NativeArray.forEach
 import kotlinx.coroutines.*
 import java.lang.IllegalArgumentException
 import java.util.*
@@ -29,16 +28,16 @@ class PostfixParser(eqString: String) : PostfixBaseParser(eqString) {
     private suspend fun breakAll(eqString: String): ArrayList<String> = withContext(Dispatchers.Default) {
         val eq = eqString.replace(" ", "")
 
-        val breakables = ArrayList<String>().apply { addAll(Delimiter.types) }
-        Operator.Type.values().forEach { breakables.add(it.value) }
+        val splitters = ArrayList<String>().apply { addAll(Delimiter.types) }
+        Operator.Type.values().forEach { splitters.add(it.value) }
 
         val breaks = ArrayList<String>().apply { add(eq) }
-        for (o in breakables) {
+        for (splitter in splitters) {
             val a = ArrayList<String>()
             for (ind in 0 until breaks.size) {
                 breaks[ind].let {
                     if(it.length > 1) {
-                        val job = async { breakString(it, o) }
+                        val job = async { breakString(it, splitter) }
                         a.addAll(job.await())
                     } else a.add(it)
                 }

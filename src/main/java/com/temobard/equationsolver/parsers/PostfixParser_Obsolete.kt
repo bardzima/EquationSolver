@@ -2,12 +2,7 @@ package com.temobard.equationsolver.parsers
 
 import com.temobard.equationsolver.solvers.PostfixSolver
 import com.temobard.equationsolver.tokens.*
-import com.temobard.equationsolver.tokens.Number
 import com.temobard.equationsolver.tokens.Operator
-import com.temobard.equationsolver.tokens.Variable
-import java.lang.IllegalArgumentException
-import java.util.*
-import javax.swing.plaf.ListUI
 import kotlin.collections.ArrayList
 
 class PostfixParser_Obsolete(eqString: String) : PostfixBaseParser(eqString) {
@@ -19,15 +14,19 @@ class PostfixParser_Obsolete(eqString: String) : PostfixBaseParser(eqString) {
     override fun parse(): PostfixSolver {
         val eq = eqString.replace(" ", "")
 
-        val breakables = ArrayList<String>()
-        Operator.Type.values().forEach { breakables.add(it.value) }
-        Delimiter.types.forEach { breakables.add(it) }
+        val splitters = ArrayList<String>()
+        Operator.Type.values().forEach { splitters.add(it.value) }
+        Delimiter.types.forEach { splitters.add(it) }
 
         val breaks = ArrayList<String>().apply { add(eq) }
-        for (o in breakables) {
+        for (s in splitters) {
             val a = ArrayList<String>()
             for (ind in 0 until breaks.size) {
-                a.addAll(breakString(breaks[ind], o))
+                breaks[ind].let {
+                    if (it.length > 1) {
+                        a.addAll(breakString(breaks[ind], s))
+                    } else a.add(it)
+                }
             }
             breaks.clear()
             breaks.addAll(a)

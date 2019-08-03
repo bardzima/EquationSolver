@@ -31,9 +31,9 @@ class PostfixSolver(private val polish: ArrayList<Token>) : EquationSolver {
 
     override fun toString(): String = eqString
 
-    fun calculate(): Double = calculateFor(0.0)
+    override fun calculate(): Double = calculateFor(0.0)
 
-    fun calculateFor(value: Double): Double {
+    override fun calculateFor(value: Double): Double {
         val stack = Stack<Double>()
 
         for (token in polish) {
