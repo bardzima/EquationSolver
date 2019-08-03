@@ -25,8 +25,8 @@ println(equation.calculateFor(5.2))
 ```
 #### Example 3
 ```
-val eqString = "cos(p) * sin(pi)*max(2,3)"
-val equation = PostfixParser(eqString, "p").parse()
+val eqString = "cos(z) * sin(pi)*max(2,3)"
+val equation = PostfixParser(eqString, "z").parse()
 println(equation.calculateFor(-10.23))
 ```
 
