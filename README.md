@@ -5,7 +5,7 @@ Current version includes only the postfix notation (aka "Reverse Polish Notation
 
 The parser recognizes basic arithmetic operators (+, -, /, *, ^), trigonometric functions (currently sin, cos, tan, but more will be added soon), and methods like max and min. The parser also recognizes common constants (e.g. 'pi' or 'e') and accepts custom symbols for variable, with 'x' being the default symbol.
 
-The library is written in Kotlin, and uses Kotlin coroutines for parser optimization (which reduces the running time by 40-60% on average). Use *parseSuspend()* method if called from coroutines.
+The library is written in Kotlin, and uses Kotlin coroutines for parser optimization (which reduces the running time by 40-60% on average). Use *parseSuspend()* method if called from a coroutine scope.
 
 # Usage
 Use *Parser class to parse the expression string. Use *Solver class to solve the parsed equation.
@@ -25,8 +25,8 @@ println(equation.calculateFor(5.2))
 ```
 #### Example 3
 ```
-val eqString = "cos(x) * sin(pi)*max(2,3)"
-val equation = PostfixParser(eqString, "p").parse()
+val eqString = "cos(z) * sin(pi)*max(2,3)"
+val equation = PostfixParser(eqString, "z").parse()
 println(equation.calculateFor(-10.23))
 ```
 
