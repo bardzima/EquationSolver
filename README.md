@@ -3,7 +3,7 @@ A small but fast growing mathematical expressions parser based on the [Shunting-
 
 Current version includes only the postfix notation (aka "Reverse Polish Notation" (RPN)) based solver, however other notations might be added later.
 
-The parser recognizes basic arithmetic operators (+, -, /, *, ^), trigonometric functions (currently sin, cos, tan, but more will be added soon), and methods like max and min. The parser also recognizes common constants (e.g. 'pi' or 'e') and accepts custom symbols for variable, with 'x' being the default symbol.
+The parser recognizes basic arithmetic operators (+, -, /, *, ^), trigonometric functions (currently sin, cos, tan, but more will be added soon), and methods like max and min. The parser also recognizes common constants (e.g. 'pi' or 'e') and accepts custom variable symbols, with 'x' being the default.
 
 The library is written in Kotlin, and uses Kotlin coroutines for parser optimization (which reduces the running time by 40-60% on average). Use *parseSuspend()* method if called from a coroutine scope.
 
