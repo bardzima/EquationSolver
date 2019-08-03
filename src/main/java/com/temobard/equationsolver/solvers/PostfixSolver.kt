@@ -41,16 +41,10 @@ class PostfixSolver(private val polish: ArrayList<Token>) : EquationSolver {
                 is Variable -> stack.push(value)
                 is Operator -> {
                     val right = stack.pop()
-                    val left = stack.pop()
-
                     stack.push(
-                        when (token.type) {
-                            Operator.Type.ADD -> left + right
-                            Operator.Type.SUBTRACT -> left - right
-                            Operator.Type.MULTIPLY -> left * right
-                            Operator.Type.DIVIDE -> left / right
-                            Operator.Type.POWER -> right.pow(left)
-                            Operator.Type.SINE -> sin(right)
+                        when {
+                            token.type.operandCount == 1 -> token.execute(right)
+                            token.type.operandCount == 2 -> token.execute(stack.pop(), right)
                             else -> throw IllegalArgumentException()
                         }
                     )

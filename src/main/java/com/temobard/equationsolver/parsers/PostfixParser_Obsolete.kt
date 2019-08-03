@@ -5,39 +5,30 @@ import com.temobard.equationsolver.tokens.*
 import com.temobard.equationsolver.tokens.Number
 import com.temobard.equationsolver.tokens.Operator
 import com.temobard.equationsolver.tokens.Variable
-import kotlinx.coroutines.*
 import java.lang.IllegalArgumentException
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PostfixCoroutineParser(eqString: String) : PostfixBaseParser(eqString) {
+class PostfixParser_Obsolete(eqString: String) : PostfixBaseParser(eqString) {
 
     constructor(eqString: String, variableSymbol: String) : this(eqString) {
         this.variableSymbol = variableSymbol
     }
 
-    override fun parse(): PostfixSolver = runBlocking {
-        parseSuspend()
-    }
-
-    suspend fun parseSuspend(): PostfixSolver {
-        val breaks = breakAll(eqString)
-        return PostfixSolver(infixToPostfix(breaks))
-    }
-
-    private suspend fun breakAll(eqString: String): ArrayList<String> = withContext(Dispatchers.Default) {
+    override fun parse(): PostfixSolver {
         val eq = eqString.replace(" ", "")
+
         val breaks = ArrayList<String>().apply { add(eq) }
         for (o in Operator.Type.values()) {
             val a = ArrayList<String>()
             for (ind in 0 until breaks.size) {
-                val job = async { breakString(breaks[ind], o.value) }
-                a.addAll(job.await())
+                a.addAll(breakString(breaks[ind], o.value))
             }
             breaks.clear()
             breaks.addAll(a)
         }
-        breaks
+
+        return PostfixSolver(infixToPostfix(breaks))
     }
 
     private fun breakString(input: String, delimeter: String): ArrayList<String> {
