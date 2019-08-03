@@ -16,6 +16,7 @@ class PostfixSolver(private val polish: ArrayList<Token>) : EquationSolver {
                 is Number -> stringBuilder.append(token.value)
                 is Variable -> stringBuilder.append(token.symbol)
                 is Operator -> stringBuilder.append(token.type.value)
+                is Constant -> stringBuilder.append(token.type.moniker)
                 else -> throw Exception()
             }
             stringBuilder.append(" ")
@@ -38,6 +39,7 @@ class PostfixSolver(private val polish: ArrayList<Token>) : EquationSolver {
         for (token in polish) {
             when (token) {
                 is Number -> stack.push(token.value)
+                is Constant -> stack.push(token.type.value)
                 is Variable -> stack.push(value)
                 is Operator -> {
                     val right = stack.pop()

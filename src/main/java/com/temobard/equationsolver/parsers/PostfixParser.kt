@@ -5,6 +5,7 @@ import com.temobard.equationsolver.tokens.*
 import com.temobard.equationsolver.tokens.Number
 import com.temobard.equationsolver.tokens.Operator
 import com.temobard.equationsolver.tokens.Variable
+import jdk.nashorn.internal.objects.NativeArray.forEach
 import kotlinx.coroutines.*
 import java.lang.IllegalArgumentException
 import java.util.*
@@ -27,12 +28,20 @@ class PostfixParser(eqString: String) : PostfixBaseParser(eqString) {
 
     private suspend fun breakAll(eqString: String): ArrayList<String> = withContext(Dispatchers.Default) {
         val eq = eqString.replace(" ", "")
+
+        val breakables = ArrayList<String>().apply { addAll(Delimiter.types) }
+        Operator.Type.values().forEach { breakables.add(it.value) }
+
         val breaks = ArrayList<String>().apply { add(eq) }
-        for (o in Operator.Type.values()) {
+        for (o in breakables) {
             val a = ArrayList<String>()
             for (ind in 0 until breaks.size) {
-                val job = async { breakString(breaks[ind], o.value) }
-                a.addAll(job.await())
+                breaks[ind].let {
+                    if(it.length > 1) {
+                        val job = async { breakString(it, o) }
+                        a.addAll(job.await())
+                    } else a.add(it)
+                }
             }
             breaks.clear()
             breaks.addAll(a)
@@ -49,56 +58,6 @@ class PostfixParser(eqString: String) : PostfixBaseParser(eqString) {
         }
         array.removeAt(array.size - 1)
         return array
-    }
-
-    private fun infixToPostfix(tokens: List<String>): ArrayList<Token> {
-        val stack = Stack<Token>()
-        val output = ArrayList<Token>()
-
-        for (tokenString in tokens) {
-            if (tokenString.isEmpty()) continue
-            when (val token = assignToken(tokenString)) {
-                is Number, is Variable -> output.add(token)
-                is Operator -> {
-                    when (token.type) {
-                        Operator.Type.PAR_LEFT -> stack.push(token)
-                        Operator.Type.PAR_RIGHT -> {
-                            var top = stack.popOrNull<Operator>()
-                            while (top != null && top.type != Operator.Type.PAR_LEFT) {
-                                output.add(top);
-                                top = stack.popOrNull<Operator>()
-                            }
-                            if (top?.type != Operator.Type.PAR_LEFT)
-                                throw IllegalArgumentException("No matching left parenthesis.");
-                        }
-                        else -> {
-                            var op2 = stack.peekOrNull<Operator>()
-                            while (op2 != null) {
-                                val c = token.type.rank.compareTo(op2.type.rank);
-                                if (c < 0 || !token.type.rightAssociative && c <= 0) {
-                                    output.add(stack.pop());
-                                } else {
-                                    break;
-                                }
-                                op2 = stack.peekOrNull<Operator>()
-                            }
-                            stack.push(token);
-                        }
-                    }
-                }
-            }
-        }
-
-        while (!stack.isEmpty()) {
-            stack.peekOrNull<Operator>()?.let {
-                if (it.type == Operator.Type.PAR_LEFT)
-                    throw IllegalArgumentException("No matching right parenthesis.");
-            }
-            val top = stack.pop();
-            output.add(top);
-        }
-
-        return output
     }
 
     private suspend fun infixToPostfixCoroutine_Experimental(tokens: List<String>): ArrayList<Token> =

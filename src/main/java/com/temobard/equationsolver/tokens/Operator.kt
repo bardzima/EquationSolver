@@ -11,8 +11,12 @@ class Operator(val type: Type) : Token {
         Type.DIVIDE -> left / right!!
         Type.MULTIPLY -> left * right!!
         Type.POWER -> left.pow(right!!)
+        Type.SQRT -> sqrt(left)
         Type.SINE -> sin(left)
         Type.COSINE -> cos(left)
+        Type.TANGENT -> tan(left)
+        Type.MAX -> max(left, right!!)
+        Type.MIN -> min(left, right!!)
         else -> throw IllegalArgumentException("Operator not supported")
     }
 
@@ -24,8 +28,12 @@ class Operator(val type: Type) : Token {
         DIVIDE("/", 3, false, 2),
         MULTIPLY("*", 3, false, 2),
         POWER("^", 4, true, 2),
+        SQRT("sqrt", 3, false, 1),
         SINE("sin", 3, true, 1),
-        COSINE("cos", 3, false, 1),
+        COSINE("cos", 3, true, 1),
+        TANGENT("tan", 3, true, 1),
+        MAX("max", 3, true, 2),
+        MIN("min", 3, true, 2),
         PAR_LEFT("(", 1, false, 0),
         PAR_RIGHT(")", 1, false, 0)
     }
