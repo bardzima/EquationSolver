@@ -3,9 +3,33 @@ A small but fast growing mathematical expressions parser based on Shunting-yard 
 
 Current version includes only the postfix notation (aka "Reverse Polish Notation" (RPN)) based solver, however other notations might be added later.
 
-The parser recognizes basic arithmetic operators (+, -, /, *, ^), trigonometric functions (currently sin, cos, tan, but more will be added soon), and methods like max and min.
+The parser recognizes basic arithmetic operators (+, -, /, *, ^), trigonometric functions (currently sin, cos, tan, but more will be added soon), and methods like max and min. The parser also recognizes common constants (e.g. 'pi' or 'e') and accepts custom symbols for variable, with 'x' being the default symbol.
 
 The library is written in Kotlin, and uses Kotlin coroutines for parser optimization (which reduces the running time by 40-60% on average).
+
+# Usage
+Use *Parser class to parse the expression string. Use *Solver class to solve the parsed equation.
+
+# Examples
+#### Example 1
+```
+val eqString = "33 + 4 * 2 / ((( 1 - 5 ) ^ 2) ^ 3)"
+val equation = PostfixParser(eqString).parseSuspend()
+println(equation.calculate())
+```
+#### Example 2
+```
+val eqString = "x + 3*(x+(4+7)) - (3-x)"
+val equation = PostfixParser(eqString).parseSuspend()
+println(equation.calculateFor(5.2))
+```
+#### Example 3
+```
+val eqString = "cos(x) * sin(pi)*max(2,3)"
+val equation = PostfixParser(eqString, "p").parseSuspend()
+println(equation.calculateFor(-10.23))
+```
+
 
 # License
 
