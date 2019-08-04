@@ -10,22 +10,40 @@ import java.lang.IllegalArgumentException
 import java.util.*
 import kotlin.collections.ArrayList
 
+/**
+ * The postfix (Reverse Polish Notation) parser.
+ * Uses the Shunting-yard algorithm to parse a mathematical expression
+ * @param eqString String containing the expression
+ */
 class PostfixParser(eqString: String) : PostfixBaseParser(eqString) {
 
     constructor(eqString: String, variableSymbol: String) : this(eqString) {
         this.variableSymbol = variableSymbol
     }
 
+    /**
+     * Thread-blocking parser method.
+     * Use this method only from within a regular thread.
+     * @return parsed equation in Reversed Polish Notation format
+     */
     override fun parse(): PostfixSolver = runBlocking {
         parseSuspend()
     }
 
+    /**
+     * Coroutine scope-friendly parser method.
+     * Call this method from a coroutine scope.
+     * @return parsed equation in Reversed Polish Notation format
+     */
     suspend fun parseSuspend(): PostfixSolver {
-        val breaks = breakAll(eqString)
-        return PostfixSolver(infixToPostfix(breaks))
+        val splits = splitAll(eqString)
+        return PostfixSolver(infixToPostfix(splits))
     }
 
-    private suspend fun breakAll(eqString: String): ArrayList<String> = withContext(Dispatchers.Default) {
+    /**
+     * Splits the expression string into tokens
+     */
+    private suspend fun splitAll(eqString: String): ArrayList<String> = withContext(Dispatchers.Default) {
         val eq = eqString.replace(" ", "")
 
         val splitters = ArrayList<String>().apply { addAll(Delimiter.types) }
@@ -37,7 +55,7 @@ class PostfixParser(eqString: String) : PostfixBaseParser(eqString) {
             for (ind in 0 until breaks.size) {
                 breaks[ind].let {
                     if(it.length > 1) {
-                        val job = async { breakString(it, splitter) }
+                        val job = async { splitString(it, splitter) }
                         a.addAll(job.await())
                     } else a.add(it)
                 }
@@ -48,7 +66,10 @@ class PostfixParser(eqString: String) : PostfixBaseParser(eqString) {
         breaks
     }
 
-    private fun breakString(input: String, delimeter: String): ArrayList<String> {
+    /**
+     * Splits string into a series of sub-strings
+     */
+    private fun splitString(input: String, delimeter: String): ArrayList<String> {
         val tokens = input.split(delimeter)
         val array = ArrayList<String>()
         for (t in tokens) {
@@ -59,6 +80,9 @@ class PostfixParser(eqString: String) : PostfixBaseParser(eqString) {
         return array
     }
 
+    /**
+     * Experimental infix-to-postfix converter
+     */
     private suspend fun infixToPostfixCoroutine_Experimental(tokens: List<String>): ArrayList<Token> =
         withContext(Dispatchers.IO) {
         val stack = Stack<Token>()

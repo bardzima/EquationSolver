@@ -7,6 +7,10 @@ import kotlin.collections.ArrayList
 import kotlin.math.pow
 import kotlin.math.sin
 
+/**
+ * Postfix notation (Reverse Polish Notation) based solver
+ * @param polish an array of tokens organized in the RPN order
+ */
 class PostfixSolver(private val polish: ArrayList<Token>) : EquationSolver {
 
     private val eqString by lazy {
@@ -24,6 +28,9 @@ class PostfixSolver(private val polish: ArrayList<Token>) : EquationSolver {
         stringBuilder.toString()
     }
 
+    /**
+     * Optimize the given RPN series as much as possible in order to reduce calculation time
+     */
     fun optimize() {
         //TODO: here we should pre-calculate the numeric part of the equation
         //in order to reduce the overall calculation time
@@ -31,8 +38,18 @@ class PostfixSolver(private val polish: ArrayList<Token>) : EquationSolver {
 
     override fun toString(): String = eqString
 
+    /**
+     * Calculates the RPN array.
+     * Use this function for either numeric equations, or for the 0 value of symbolic equations
+     * @return calculated value
+     */
     override fun calculate(): Double = calculateFor(0.0)
 
+    /**
+     * Calculates the RPN array.
+     * @param value variable value to calculate equation for
+     * @return calculated value
+     */
     override fun calculateFor(value: Double): Double {
         val stack = Stack<Double>()
 

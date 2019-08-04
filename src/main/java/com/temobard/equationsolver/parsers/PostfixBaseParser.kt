@@ -4,9 +4,17 @@ import com.temobard.equationsolver.tokens.*
 import com.temobard.equationsolver.tokens.Number
 import java.util.*
 
+/**
+ * The abstract class for postfix (Reverse Polish Notation) parser.
+ * Uses the Shunting-yard algorithm to parse a mathematical expression
+ * @param eqString String containing the expression
+ */
 abstract class PostfixBaseParser(protected val eqString: String) : EquationParser {
     protected var variableSymbol = "x"
 
+    /**
+     * Infix-to-postfix converter
+     */
     protected fun infixToPostfix(tokens: List<String>): ArrayList<Token> {
         val stack = Stack<Token>()
         val output = ArrayList<Token>()
@@ -58,6 +66,9 @@ abstract class PostfixBaseParser(protected val eqString: String) : EquationParse
         return output
     }
 
+    /**
+     * Looks up the token that matches the string version of expression atom
+     */
     protected fun assignToken(tokenString: String): Token {
 
         //Check number

@@ -5,6 +5,7 @@ import com.temobard.equationsolver.tokens.*
 import com.temobard.equationsolver.tokens.Operator
 import kotlin.collections.ArrayList
 
+@Deprecated("This class is deprecated. Use PostfixParser class instead")
 class PostfixParser_Obsolete(eqString: String) : PostfixBaseParser(eqString) {
 
     constructor(eqString: String, variableSymbol: String) : this(eqString) {
