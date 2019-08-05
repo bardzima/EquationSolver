@@ -22,7 +22,7 @@ class Operator(val type: Type) : Token {
 
     fun execute(value: Double): Double = execute(value, null)
 
-    enum class Type(val value: String, val rank: Int, val rightAssociative: Boolean, val operandCount: Int) {
+    enum class Type(val value: String, val precedence: Int, val rightAssociative: Boolean, val operandCount: Int) {
         SUBTRACT("-", 2, false, 2),
         ADD("+", 2, false, 2),
         DIVIDE("/", 3, false, 2),

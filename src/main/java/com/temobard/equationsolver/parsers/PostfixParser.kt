@@ -112,7 +112,7 @@ class PostfixParser(eqString: String) : PostfixBaseParser(eqString) {
                         else -> {
                             var op2 = stack.peekOrNull<Operator>()
                             while (op2 != null) {
-                                val c = token.type.rank.compareTo(op2.type.rank);
+                                val c = token.type.precedence.compareTo(op2.type.precedence);
                                 if (c < 0 || !token.type.rightAssociative && c <= 0) {
                                     output.add(stack.pop());
                                 } else {
