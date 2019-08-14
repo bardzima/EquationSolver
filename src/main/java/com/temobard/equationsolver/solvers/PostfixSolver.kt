@@ -75,16 +75,6 @@ class PostfixSolver(private val polish: ArrayList<Token>) : EquationSolver {
                     }
                     stack.push(expr.solve())
                 }
-                is Operator_deprecated -> {
-                    val right = stack.pop()
-                    stack.push(
-                        when {
-                            token.type.operandCount == 1 -> token.execute(right)
-                            token.type.operandCount == 2 -> token.execute(stack.pop(), right)
-                            else -> throw IllegalArgumentException()
-                        }
-                    )
-                }
             }
         }
 

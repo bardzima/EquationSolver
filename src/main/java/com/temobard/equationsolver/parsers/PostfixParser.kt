@@ -2,12 +2,7 @@ package com.temobard.equationsolver.parsers
 
 import com.temobard.equationsolver.solvers.PostfixSolver
 import com.temobard.equationsolver.tokens.*
-import com.temobard.equationsolver.tokens.Number
-import com.temobard.equationsolver.tokens.Operator_deprecated
-import com.temobard.equationsolver.tokens.Variable
 import kotlinx.coroutines.*
-import java.lang.IllegalArgumentException
-import java.util.*
 import kotlin.collections.ArrayList
 
 /**
@@ -79,64 +74,5 @@ class PostfixParser(eqString: String) : PostfixBaseParser(eqString) {
         }
         array.removeAt(array.size - 1)
         return array
-    }
-
-    /**
-     * Experimental infix-to-postfix converter
-     */
-    private suspend fun infixToPostfixCoroutine_Experimental(tokens: List<String>): ArrayList<Token> =
-        withContext(Dispatchers.IO) {
-        val stack = Stack<Token>()
-        val output = ArrayList<Token>()
-
-        for (tokenString in tokens) {
-            if (tokenString.isEmpty()) continue
-
-            val job = async {
-                assignToken(tokenString)
-            }
-
-            when (val token = job.await()) {
-                is Number, is Variable -> output.add(token)
-                is Operator_deprecated -> {
-                    when (token.type) {
-                        Operator_deprecated.Type.PAR_LEFT -> stack.push(token)
-                        Operator_deprecated.Type.PAR_RIGHT -> {
-                            var top = stack.popOrNull<Operator_deprecated>()
-                            while (top != null && top.type != Operator_deprecated.Type.PAR_LEFT) {
-                                output.add(top);
-                                top = stack.popOrNull<Operator_deprecated>()
-                            }
-                            if (top?.type != Operator_deprecated.Type.PAR_LEFT)
-                                throw IllegalArgumentException("No matching left parenthesis.");
-                        }
-                        else -> {
-                            var op2 = stack.peekOrNull<Operator_deprecated>()
-                            while (op2 != null) {
-                                val c = token.type.precedence.compareTo(op2.type.precedence);
-                                if (c < 0 || !token.type.rightAssociative && c <= 0) {
-                                    output.add(stack.pop());
-                                } else {
-                                    break;
-                                }
-                                op2 = stack.peekOrNull<Operator_deprecated>()
-                            }
-                            stack.push(token)
-                        }
-                    }
-                }
-            }
-        }
-
-        while (!stack.isEmpty()) {
-            stack.peekOrNull<Operator_deprecated>()?.let {
-                if (it.type == Operator_deprecated.Type.PAR_LEFT)
-                    throw IllegalArgumentException("No matching right parenthesis.");
-            }
-            val top = stack.pop()
-            output.add(top)
-        }
-
-        output
     }
 }
