@@ -39,7 +39,7 @@ class PostfixParser(eqString: String) : PostfixBaseParser(eqString) {
      * Splits the expression string into tokens
      */
     private suspend fun splitAll(eqString: String): ArrayList<String> = withContext(Dispatchers.Default) {
-        val eq = eqString.replace(" ", "")
+        val eq = eqString.replace(" ", "").toLowerCase()
 
         val splitters = ArrayList<String>().apply { addAll(Delimiter.types) }
 //        Operator_deprecated.Type.values().forEach { splitters.Add(it.value) }
