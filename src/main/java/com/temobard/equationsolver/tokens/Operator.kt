@@ -1,40 +1,24 @@
 package com.temobard.equationsolver.tokens
 
-import java.lang.IllegalArgumentException
-import kotlin.math.*
+enum class Operator(val value: String, val precedence: Int, val rightAssociative: Boolean) : Token {
 
-class Operator(val type: Type) : Token {
+    SUBTRACT("-", 2, false),
+    ADD("+", 2, false),
+    DIVIDE("/", 3, false),
+    MULTIPLY("*", 3, false),
+    POWER("^", 4, true),
+    SQRT("sqrt", 3, false),
+    SINE("sin", 3, true),
+    COSINE("cos", 3, true),
+    TANGENT("tan", 3, true),
+    MAX("max", 3, true),
+    MIN("min", 3, true),
+    PAR_LEFT("(", 1, false),
+    PAR_RIGHT(")", 1, false)
 
-    fun execute(left: Double, right: Double?): Double = when (type) {
-        Type.ADD -> left + right!!
-        Type.SUBTRACT -> left - right!!
-        Type.DIVIDE -> left / right!!
-        Type.MULTIPLY -> left * right!!
-        Type.POWER -> left.pow(right!!)
-        Type.SQRT -> sqrt(left)
-        Type.SINE -> sin(left)
-        Type.COSINE -> cos(left)
-        Type.TANGENT -> tan(left)
-        Type.MAX -> max(left, right!!)
-        Type.MIN -> min(left, right!!)
-        else -> throw IllegalArgumentException("Operator not supported")
-    }
-
-    fun execute(value: Double): Double = execute(value, null)
-
-    enum class Type(val value: String, val precedence: Int, val rightAssociative: Boolean, val operandCount: Int) {
-        SUBTRACT("-", 2, false, 2),
-        ADD("+", 2, false, 2),
-        DIVIDE("/", 3, false, 2),
-        MULTIPLY("*", 3, false, 2),
-        POWER("^", 4, true, 2),
-        SQRT("sqrt", 3, false, 1),
-        SINE("sin", 3, true, 1),
-        COSINE("cos", 3, true, 1),
-        TANGENT("tan", 3, true, 1),
-        MAX("max", 3, true, 2),
-        MIN("min", 3, true, 2),
-        PAR_LEFT("(", 1, false, 0),
-        PAR_RIGHT(")", 1, false, 0)
-    }
+/*    class Add : Operator("+", 2, false)
+    class Subtract : Operator("-", 2, false)
+    class Multiply : Operator("*", 3, false)
+    class Divide : Operator("/", 3, false)
+    class Power: Operator("^", 4, true)*/
 }

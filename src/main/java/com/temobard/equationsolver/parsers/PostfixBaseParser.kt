@@ -25,29 +25,29 @@ abstract class PostfixBaseParser(protected val eqString: String) : EquationParse
                 is Number, is Variable, is Constant -> output.add(token)
                 is Delimiter -> {/*IGNORE*/}
                 is Operator -> {
-                    when (token.type) {
-                        Operator.Type.PAR_LEFT -> stack.push(token)
-                        Operator.Type.PAR_RIGHT -> {
+                    when (token) {
+                        Operator.PAR_LEFT -> stack.push(token)
+                        Operator.PAR_RIGHT -> {
                             var top = stack.popOrNull<Operator>()
-                            while (top != null && top.type != Operator.Type.PAR_LEFT) {
-                                output.add(top);
+                            while (top != null && top != Operator.PAR_LEFT) {
+                                output.add(top)
                                 top = stack.popOrNull<Operator>()
                             }
-                            if (top?.type != Operator.Type.PAR_LEFT)
-                                throw java.lang.IllegalArgumentException("No matching left parenthesis.");
+                            if (top != Operator.PAR_LEFT)
+                                throw java.lang.IllegalArgumentException("No matching left parenthesis.")
                         }
                         else -> {
                             var op2 = stack.peekOrNull<Operator>()
                             while (op2 != null) {
-                                val c = token.type.precedence.compareTo(op2.type.precedence);
-                                if (c < 0 || !token.type.rightAssociative && c <= 0) {
-                                    output.add(stack.pop());
+                                val c = token.precedence.compareTo(op2.precedence)
+                                if (c < 0 || !token.rightAssociative && c <= 0) {
+                                    output.add(stack.pop())
                                 } else {
-                                    break;
+                                    break
                                 }
                                 op2 = stack.peekOrNull<Operator>()
                             }
-                            stack.push(token);
+                            stack.push(token)
                         }
                     }
                 }
@@ -56,11 +56,11 @@ abstract class PostfixBaseParser(protected val eqString: String) : EquationParse
 
         while (!stack.isEmpty()) {
             stack.peekOrNull<Operator>()?.let {
-                if (it.type == Operator.Type.PAR_LEFT)
-                    throw java.lang.IllegalArgumentException("No matching right parenthesis.");
+                if (it == Operator.PAR_LEFT)
+                    throw java.lang.IllegalArgumentException("No matching right parenthesis.")
             }
-            val top = stack.pop();
-            output.add(top);
+            val top = stack.pop()
+            output.add(top)
         }
 
         return output
@@ -79,8 +79,8 @@ abstract class PostfixBaseParser(protected val eqString: String) : EquationParse
         if (tokenString == variableSymbol) return Variable()
 
         //Check operator
-        for (op in Operator.Type.values()) {
-            if (op.value == tokenString) return Operator(op)
+        for (op in Operator.values()) {
+            if (op.value == tokenString) return op
         }
 
         //Check constants

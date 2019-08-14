@@ -2,7 +2,7 @@ package com.temobard.equationsolver.parsers
 
 import com.temobard.equationsolver.solvers.PostfixSolver
 import com.temobard.equationsolver.tokens.*
-import com.temobard.equationsolver.tokens.Operator
+import com.temobard.equationsolver.tokens.Operator_deprecated
 import kotlin.collections.ArrayList
 
 @Deprecated("This class is deprecated. Use PostfixParser class instead")
@@ -16,7 +16,7 @@ class PostfixParser_Obsolete(eqString: String) : PostfixBaseParser(eqString) {
         val eq = eqString.replace(" ", "")
 
         val splitters = ArrayList<String>()
-        Operator.Type.values().forEach { splitters.add(it.value) }
+        Operator_deprecated.Type.values().forEach { splitters.add(it.value) }
         Delimiter.types.forEach { splitters.add(it) }
 
         val breaks = ArrayList<String>().apply { add(eq) }

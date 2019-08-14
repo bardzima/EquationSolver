@@ -4,8 +4,6 @@ import com.temobard.equationsolver.tokens.*
 import com.temobard.equationsolver.tokens.Number
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.math.pow
-import kotlin.math.sin
 
 /**
  * Postfix notation (Reverse Polish Notation) based solver
@@ -19,7 +17,7 @@ class PostfixSolver(private val polish: ArrayList<Token>) : EquationSolver {
             when (token) {
                 is Number -> stringBuilder.append(token.value)
                 is Variable -> stringBuilder.append(token.symbol)
-                is Operator -> stringBuilder.append(token.type.value)
+                is Operator -> stringBuilder.append(token.value)
                 is Constant -> stringBuilder.append(token.type.moniker)
                 else -> throw Exception()
             }
@@ -59,6 +57,25 @@ class PostfixSolver(private val polish: ArrayList<Token>) : EquationSolver {
                 is Constant -> stack.push(token.type.value)
                 is Variable -> stack.push(value)
                 is Operator -> {
+                    val right = stack.pop()
+                    val expr = when(token) {
+                        Operator.ADD -> Expression.Add(stack.pop(), right)
+                        Operator.SUBTRACT -> Expression.Subtract(stack.pop(), right)
+                        Operator.MULTIPLY -> Expression.Multiply(stack.pop(), right)
+                        Operator.DIVIDE -> Expression.Divide(stack.pop(), right)
+                        Operator.POWER -> Expression.Power(stack.pop(), right)
+                        Operator.SQRT -> Expression.Sqrt(right)
+                        Operator.SINE -> Expression.Sin(right)
+                        Operator.COSINE -> Expression.Cos(right)
+                        Operator.TANGENT -> Expression.Tan(right)
+                        Operator.MAX -> Expression.Max(stack.pop(), right)
+                        Operator.MIN -> Expression.Min(stack.pop(), right)
+                        else -> throw IllegalArgumentException()
+
+                    }
+                    stack.push(expr.solve())
+                }
+                is Operator_deprecated -> {
                     val right = stack.pop()
                     stack.push(
                         when {
