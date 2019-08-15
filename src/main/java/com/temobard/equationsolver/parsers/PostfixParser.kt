@@ -42,7 +42,6 @@ class PostfixParser(eqString: String) : PostfixBaseParser(eqString) {
         val eq = eqString.replace(" ", "").toLowerCase()
 
         val splitters = ArrayList<String>().apply { addAll(Delimiter.types) }
-//        Operator_deprecated.Type.values().forEach { splitters.Add(it.value) }
         Operator.values().forEach { splitters.add(it.value) }
 
         val breaks = ArrayList<String>().apply { add(eq) }

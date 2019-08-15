@@ -63,13 +63,31 @@ class PostfixSolver(private val polish: ArrayList<Token>) : EquationSolver {
                         Operator.SUBTRACT -> Expression.Subtract(stack.pop(), right)
                         Operator.MULTIPLY -> Expression.Multiply(stack.pop(), right)
                         Operator.DIVIDE -> Expression.Divide(stack.pop(), right)
+
                         Operator.POWER -> Expression.Power(stack.pop(), right)
                         Operator.SQRT -> Expression.Sqrt(right)
+                        Operator.EXP -> Expression.Exponent(right)
+                        Operator.LOG -> Expression.Logarithm(stack.pop(), right)
+                        Operator.LN -> Expression.LogNatural(right)
+                        Operator.LOG10 -> Expression.Log10(right)
+                        Operator.LOG2 -> Expression.Log2(right)
+
                         Operator.SINE -> Expression.Sin(right)
                         Operator.COSINE -> Expression.Cos(right)
                         Operator.TANGENT -> Expression.Tan(right)
+                        Operator.COTANGENT -> Expression.Cot(right)
+                        Operator.SECANT -> Expression.Sec(right)
+                        Operator.COSECANT -> Expression.Csc(right)
+                        Operator.ASIN -> Expression.Asin(right)
+                        Operator.ASINH -> Expression.Asinh(right)
+                        Operator.ACOS -> Expression.Acos(right)
+                        Operator.ACOSH -> Expression.Acosh(right)
+                        Operator.ATAN -> Expression.Atan(right)
+                        Operator.ATANH -> Expression.Atanh(right)
+
                         Operator.MAX -> Expression.Max(stack.pop(), right)
                         Operator.MIN -> Expression.Min(stack.pop(), right)
+
                         else -> throw IllegalArgumentException()
 
                     }
