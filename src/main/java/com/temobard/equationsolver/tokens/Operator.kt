@@ -28,6 +28,7 @@ enum class Operator(val value: String, val precedence: Int, val rightAssociative
     ATAN("atan", 3, true),
     ATANH("atanh", 3, true),
 
+    ABS("abs", 3, true),
     MAX("max", 3, true),
     MIN("min", 3, true),
 

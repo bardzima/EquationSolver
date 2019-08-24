@@ -85,6 +85,7 @@ class PostfixSolver(private val polish: ArrayList<Token>) : EquationSolver {
                         Operator.ATAN -> Expression.Atan(right)
                         Operator.ATANH -> Expression.Atanh(right)
 
+                        Operator.ABS -> Expression.Abs(right)
                         Operator.MAX -> Expression.Max(stack.pop(), right)
                         Operator.MIN -> Expression.Min(stack.pop(), right)
 

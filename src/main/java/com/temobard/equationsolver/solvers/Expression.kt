@@ -21,7 +21,7 @@ sealed class Expression {
         is Sin -> sin(value)
         is Cos -> cos(value)
         is Tan -> tan(value)
-        is Cot -> TODO()
+        is Cot -> 1.0 / tan(value)
         is Sec -> TODO()
         is Csc -> TODO()
         is Asin -> asin(value)
@@ -31,6 +31,7 @@ sealed class Expression {
         is Atan -> atan(value)
         is Atanh -> atanh(value)
 
+        is Abs -> abs(value)
         is Max -> max(left, right)
         is Min -> min(left, right)
     }
@@ -64,6 +65,7 @@ sealed class Expression {
     class Atan(val value: Double) : Expression()
     class Atanh(val value: Double) : Expression()
 
+    class Abs(val value: Double) : Expression()
     class Max(val left: Double, val right: Double) : Expression()
     class Min(val left: Double, val right: Double) : Expression()
 }
