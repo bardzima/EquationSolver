@@ -5,8 +5,6 @@ Current version includes only the postfix notation (aka "Reverse Polish Notation
 
 The parser recognizes basic arithmetic operators (+, -, /, *, ^), trigonometric functions (sin, cos, tan, and more to be added soon), and methods like max and min. The parser also recognizes common constants (e.g. 'pi' or 'e') and accepts custom variable symbols, with 'x' being the default symbol.
 
-The library is written in Kotlin, and uses Kotlin coroutines for parser optimization (which reduces the running time by 40-60% on average). Use *parseSuspend()* method if calling from a coroutine scope.
-
 # Usage
 Use the *Parser class to parse the expression string. Use the *Solver class to solve the parsed equation.
 
