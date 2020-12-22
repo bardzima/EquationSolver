@@ -9,9 +9,10 @@ import java.util.*
  * Uses the Shunting-yard algorithm to parse a mathematical expression
  * @param eqString String containing the expression
  */
-abstract class PostfixBaseParser(protected val eqString: String) : EquationParser {
-    protected var variableSymbol = "x"
-
+abstract class PostfixBaseParser(
+    protected val eqString: String,
+    private val variableSymbol: String = DEFAULT_VARIABLE_SYMBOL
+) : EquationParser {
     /**
      * Infix-to-postfix converter
      */
@@ -23,7 +24,8 @@ abstract class PostfixBaseParser(protected val eqString: String) : EquationParse
             if (tokenString.isEmpty()) continue
             when (val token = assignToken(tokenString)) {
                 is Number, is Variable, is Constant -> output.add(token)
-                is Delimiter -> {/*IGNORE*/}
+                is Delimiter -> {/*IGNORE*/
+                }
                 is Operator -> {
                     when (token) {
                         Operator.PAR_LEFT -> stack.push(token)
@@ -69,7 +71,7 @@ abstract class PostfixBaseParser(protected val eqString: String) : EquationParse
     /**
      * Looks up the token that matches the string version of expression atom
      */
-    protected fun assignToken(tokenString: String): Token {
+    private fun assignToken(tokenString: String): Token {
 
         //Check number
         val number = parseNumber(tokenString)
@@ -84,33 +86,37 @@ abstract class PostfixBaseParser(protected val eqString: String) : EquationParse
         }
 
         //Check constants
-        for(con in Constant.ConstantType.values()) {
-            if(tokenString == con.moniker) return Constant(con)
+        for (con in Constant.ConstantType.values()) {
+            if (tokenString == con.moniker) return Constant(con)
         }
 
         //Check Delimiters
-        for(del in Delimiter.types) {
-            if(tokenString == del) return Delimiter()
+        for (del in Delimiter.types) {
+            if (tokenString == del) return Delimiter()
         }
 
         throw IllegalArgumentException("Error processing '$tokenString'")
     }
 
     private fun parseNumber(numString: String): Double? = numString.toDoubleOrNull()
-}
 
-inline fun <reified T> Stack<Token>.popOrNull(): T? {
-    return try {
-        pop() as T
-    } catch (e: java.lang.Exception) {
-        null
+    private inline fun <reified T> Stack<Token>.popOrNull(): T? {
+        return try {
+            pop() as T
+        } catch (e: java.lang.Exception) {
+            null
+        }
     }
-}
 
-inline fun <reified T> Stack<Token>.peekOrNull(): T? {
-    return try {
-        peek() as T
-    } catch (e: java.lang.Exception) {
-        null
+    private inline fun <reified T> Stack<Token>.peekOrNull(): T? {
+        return try {
+            peek() as T
+        } catch (e: java.lang.Exception) {
+            null
+        }
+    }
+
+    companion object {
+        const val DEFAULT_VARIABLE_SYMBOL = "x"
     }
 }
